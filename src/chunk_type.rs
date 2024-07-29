@@ -1,12 +1,12 @@
 use std::{fmt, str::FromStr};
 
-struct ChunkType {
+pub(crate) struct ChunkType {
     chunk_type: [u8; 4],
 }
 
 impl ChunkType {
-    fn bytes(&self) -> [u8; 4] {
-        return self.chunk_type;
+    pub(crate) fn bytes(&self) -> [u8; 4] {
+        self.chunk_type
     }
 
     fn is_valid(&self) -> bool {
@@ -15,19 +15,19 @@ impl ChunkType {
                 return false;
             }
         }
-        return self.is_reserved_bit_valid();
+        self.is_reserved_bit_valid()
     }
     fn is_critical(&self) -> bool {
-        return self.chunk_type[0].is_ascii_uppercase();
+        self.chunk_type[0].is_ascii_uppercase()
     }
     fn is_public(&self) -> bool {
-        return self.chunk_type[1].is_ascii_uppercase();
+        self.chunk_type[1].is_ascii_uppercase()
     }
     fn is_reserved_bit_valid(&self) -> bool {
-        return self.chunk_type[2].is_ascii_uppercase();
+        self.chunk_type[2].is_ascii_uppercase()
     }
     fn is_safe_to_copy(&self) -> bool {
-        return self.chunk_type[3].is_ascii_lowercase();
+        self.chunk_type[3].is_ascii_lowercase()
     }
 }
 
