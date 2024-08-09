@@ -1,4 +1,4 @@
-use std::{fmt, string::FromUtf8Error};
+use std::{fmt, io::Read, string::FromUtf8Error};
 
 use crate::chunk_type::ChunkType;
 
@@ -8,7 +8,7 @@ pub(crate) struct Chunk {
 }
 
 impl Chunk {
-    fn new(chunk_type: ChunkType, data: Vec<u8>) -> Chunk {
+    pub(crate) fn new(chunk_type: ChunkType, data: Vec<u8>) -> Chunk {
         let chunk = Chunk{ chunk_type: chunk_type, chunk_data: data };
         return chunk;
     }
@@ -17,7 +17,7 @@ impl Chunk {
         self.chunk_data.len().try_into().expect("Length is too large to fit in a u32")
     }
 
-    fn chunk_type(&self) -> &ChunkType {
+    pub(crate) fn chunk_type(&self) -> &ChunkType {
         &self.chunk_type
     }
     
@@ -27,17 +27,21 @@ impl Chunk {
 
     fn crc(&self) -> u32 {
         const CRC32: crc::Crc<u32> = crc::Crc::<u32>::new(&crc::CRC_32_ISO_HDLC);
-
-        CRC32.checksum(&self.as_bytes())
+        let type_bytes = self.chunk_type().bytes();
+        let all_bytes = [type_bytes.as_slice(), self.data()].concat();
+        CRC32.checksum(all_bytes.as_slice())
     }
 
-    fn data_as_string(&self) -> Result<String, FromUtf8Error> {
+    pub(crate) fn data_as_string(&self) -> Result<String, FromUtf8Error> {
         String::from_utf8(self.data().to_vec())
     }
 
-    fn as_bytes(&self) -> Vec<u8> {
-         let mut bytes_vec = self.chunk_type().bytes().to_vec();
+    pub(crate) fn as_bytes(&self) -> Vec<u8> {
+         let mut bytes_vec = self.length().to_be_bytes().to_vec();
+         bytes_vec.extend_from_slice(self.chunk_type().bytes().as_slice());
          bytes_vec.extend_from_slice(self.data());
+         bytes_vec.extend_from_slice(self.crc().to_be_bytes().as_slice());
+
          return bytes_vec;
     }
 
