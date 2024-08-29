@@ -1,7 +1,7 @@
 use std::fmt;
 
 use crate::chunk::Chunk;
-struct Png {
+pub(crate) struct Png {
     chunks: Vec<Chunk>
 }
 
@@ -13,11 +13,11 @@ impl Png {
         return Png{ chunks: chunks}
     }
 
-    fn append_chunk(&mut self, chunk: Chunk) {
-        self.chunks.push(chunk)
+    pub(crate) fn append_chunk(&mut self, chunk: Chunk) {
+        self.chunks.push(chunk);
     }
 
-    fn remove_first_chunk(&mut self, chunk_type: &str) -> Result<Chunk, &str> {
+    pub(crate) fn remove_first_chunk(&mut self, chunk_type: &str) -> Result<Chunk, &str> {
         
         if let Some(pos) = self.chunks.iter().position(|x| x.chunk_type().to_string() == chunk_type) {
             
@@ -35,11 +35,11 @@ impl Png {
         return self.chunks.as_slice();
     }
 
-    fn chunk_by_type(&self, chunk_type: &str) -> Option<&Chunk> {
+    pub(crate) fn chunk_by_type(&self, chunk_type: &str) -> Option<&Chunk> {
         self.chunks.iter().find(|&x| x.chunk_type().to_string() == chunk_type)
     }
 
-    fn as_bytes(&self) -> Vec<u8> {
+    pub(crate) fn as_bytes(&self) -> Vec<u8> {
         let mut bytes: Vec<u8> = vec![];
         bytes.extend_from_slice(self.header());
 

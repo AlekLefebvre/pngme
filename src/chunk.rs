@@ -1,4 +1,4 @@
-use std::{fmt, io::Read, string::FromUtf8Error};
+use std::{fmt, string::FromUtf8Error};
 
 use crate::chunk_type::ChunkType;
 
